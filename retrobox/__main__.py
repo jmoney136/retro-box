@@ -10,6 +10,7 @@ from pathlib import Path
 from tkinter import messagebox, ttk
 from typing import Any
 
+from retrobox.controller import LinuxGamepad
 from retrobox.launcher import (
     build_command,
     discover_games,
@@ -29,6 +30,7 @@ class RetroBoxApp:
         self.selected_system = self.systems[0]
         self.games: list[Path] = []
         self.process: subprocess.Popen[bytes] | None = None
+        self.gamepad = LinuxGamepad()
 
         self.root.title("RetroBox")
         self.root.geometry("980x640")
@@ -38,6 +40,8 @@ class RetroBoxApp:
         self._build_layout()
         self._show_system(self.selected_system)
         self.root.after(500, self._check_process)
+        self.root.after(100, self._poll_gamepad)
+        self.root.protocol("WM_DELETE_WINDOW", self._close)
 
     def _configure_styles(self) -> None:
         style = ttk.Style()
@@ -138,7 +142,7 @@ class RetroBoxApp:
 
         ttk.Label(
             self.root,
-            text="↑ / ↓ select  •  Enter or double-click to play  •  Add your own ROMs to the listed folders",
+            text="↑ / ↓ select  •  Enter to play  •  Xbox: D-pad/stick navigate, A select, left/right change system",
             style="Subtle.TLabel",
         ).pack(anchor="w", padx=30, pady=(0, 14))
 
@@ -190,6 +194,42 @@ class RetroBoxApp:
             messagebox.showerror("Could not launch game", str(error))
             return
         self.status_label.configure(text=f"Playing {game.name}…")
+
+    def _move_game_selection(self, offset: int) -> None:
+        if not self.games:
+            return
+        selection = self.game_list.curselection()
+        index = selection[0] if selection else 0
+        index = max(0, min(len(self.games) - 1, index + offset))
+        self.game_list.selection_clear(0, tk.END)
+        self.game_list.selection_set(index)
+        self.game_list.activate(index)
+        self.game_list.see(index)
+
+    def _change_system(self, offset: int) -> None:
+        current = next(
+            (index for index, system in enumerate(self.systems) if system["id"] == self.selected_system["id"]),
+            0,
+        )
+        self._show_system(self.systems[(current + offset) % len(self.systems)])
+
+    def _poll_gamepad(self) -> None:
+        for action in self.gamepad.poll():
+            if action == "up":
+                self._move_game_selection(-1)
+            elif action == "down":
+                self._move_game_selection(1)
+            elif action == "left":
+                self._change_system(-1)
+            elif action == "right":
+                self._change_system(1)
+            elif action == "select":
+                self._launch_selected()
+        self.root.after(20 if self.gamepad.connected else 500, self._poll_gamepad)
+
+    def _close(self) -> None:
+        self.gamepad.close()
+        self.root.destroy()
 
     def _check_process(self) -> None:
         if self.process is not None and self.process.poll() is not None:

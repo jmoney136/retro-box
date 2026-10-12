@@ -1,12 +1,34 @@
 import json
+import struct
 import tempfile
 import unittest
 from pathlib import Path
 
+from retrobox.controller import GamepadMapper, decode_joystick_event
 from retrobox.launcher import build_command, discover_games, find_core, load_config
 
 
 class LauncherTests(unittest.TestCase):
+    def test_decode_joystick_event_strips_initialization_flag(self):
+        packet = struct.pack("@IhBB", 123, -32767, 0x82, 1)
+        self.assertEqual(decode_joystick_event(packet), (0x02, 1, -32767))
+
+    def test_gamepad_mapper_navigates_on_axis_edges_and_selects_with_a(self):
+        mapper = GamepadMapper()
+
+        self.assertEqual(mapper.map_event((0x02, 1, -32767)), "up")
+        self.assertIsNone(mapper.map_event((0x02, 1, -32767)))
+        self.assertIsNone(mapper.map_event((0x02, 1, 0)))
+        self.assertEqual(mapper.map_event((0x02, 1, 32767)), "down")
+        self.assertEqual(mapper.map_event((0x01, 0, 1)), "select")
+        self.assertIsNone(mapper.map_event((0x01, 0, 0)))
+
+    def test_gamepad_mapper_uses_horizontal_axis_to_change_system(self):
+        mapper = GamepadMapper()
+        self.assertEqual(mapper.map_event((0x02, 6, -32767)), "left")
+        self.assertIsNone(mapper.map_event((0x02, 6, 0)))
+        self.assertEqual(mapper.map_event((0x02, 6, 32767)), "right")
+
     def test_discover_games_filters_extensions_case_insensitively_and_sorts(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             folder = Path(temporary_directory)
