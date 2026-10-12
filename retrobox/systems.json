@@ -1,0 +1,53 @@
+{
+  "retroarch": "retroarch",
+  "core_directories": [
+    "~/.config/retroarch/cores",
+    "/usr/lib/aarch64-linux-gnu/libretro",
+    "/usr/lib/arm-linux-gnueabihf/libretro",
+    "/usr/lib/libretro"
+  ],
+  "systems": [
+    {
+      "id": "nes",
+      "name": "Nintendo Entertainment System",
+      "folder": "~/RetroBox/roms/nes",
+      "core": "nestopia_libretro.so",
+      "extensions": [".nes", ".unif", ".unf", ".fds"]
+    },
+    {
+      "id": "snes",
+      "name": "Super Nintendo",
+      "folder": "~/RetroBox/roms/snes",
+      "core": "snes9x_libretro.so",
+      "extensions": [".sfc", ".smc"]
+    },
+    {
+      "id": "gb",
+      "name": "Game Boy / Game Boy Color",
+      "folder": "~/RetroBox/roms/gb",
+      "core": "gambatte_libretro.so",
+      "extensions": [".gb", ".gbc"]
+    },
+    {
+      "id": "gba",
+      "name": "Game Boy Advance",
+      "folder": "~/RetroBox/roms/gba",
+      "core": "mgba_libretro.so",
+      "extensions": [".gba"]
+    },
+    {
+      "id": "genesis",
+      "name": "Sega Genesis / Mega Drive",
+      "folder": "~/RetroBox/roms/genesis",
+      "core": "genesis_plus_gx_libretro.so",
+      "extensions": [".md", ".gen", ".bin", ".smd"]
+    },
+    {
+      "id": "psx",
+      "name": "PlayStation",
+      "folder": "~/RetroBox/roms/psx",
+      "core": "pcsx_rearmed_libretro.so",
+      "extensions": [".cue", ".chd", ".pbp", ".iso"]
+    }
+  ]
+}
