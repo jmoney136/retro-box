@@ -8,7 +8,7 @@ RetroBox is a small, keyboard-friendly multi-system game launcher for Raspberry 
 2. If Tkinter is missing, install the `python3-tk` package using your OS package manager.
 3. Put game files in the project `roms/` folders (for example, `roms/nes/`). The workspace includes Tiny Golf and Quarti for NES, Dangan GB2 for Game Boy Color, and GBA Microjam '23 for GBA. Create other per-system folders as needed.
 4. Check `retrobox/systems.json`. Set `retroarch` to the RetroArch executable if it is not on `PATH`, and make sure `core_directories` includes the directory containing your installed `*_libretro.so` files. Edit system folders, core filenames, or supported extensions there as needed.
-5. From this project directory, run `python3 -m retrobox`.
+5. From the Pi's local text console, run `sh scripts/start_retrobox.sh`. It starts a minimal X/Openbox session and opens RetroBox; from an existing desktop session, the same command opens the app in that session. Do not run it over SSH.
 
 ### Start RetroBox automatically
 
