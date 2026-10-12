@@ -108,7 +108,7 @@ class RetroBoxApp:
         self.folder_label = ttk.Label(games_panel, text="", style="Subtle.TLabel")
         self.folder_label.pack(anchor="w", pady=(4, 14))
 
-        list_frame = ttk.Frame(games_panel, style="Panel.TFrame")
+        list_frame = ttk.Frame(games_panel, style="Panel.TFrame", padding=8)
         list_frame.pack(fill="both", expand=True)
         self.game_list = tk.Listbox(
             list_frame,
@@ -120,8 +120,6 @@ class RetroBoxApp:
             font=("TkFixedFont", 12),
             borderwidth=0,
             highlightthickness=0,
-            padx=12,
-            pady=10,
         )
         scrollbar = ttk.Scrollbar(list_frame, orient="vertical", command=self.game_list.yview)
         self.game_list.configure(yscrollcommand=scrollbar.set)

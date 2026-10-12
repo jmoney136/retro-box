@@ -10,6 +10,10 @@ RetroBox is a small, keyboard-friendly multi-system game launcher for Raspberry 
 4. Check `retrobox/systems.json`. Set `retroarch` to the RetroArch executable if it is not on `PATH`, and make sure `core_directories` includes the directory containing your installed `*_libretro.so` files. Edit system folders, core filenames, or supported extensions there as needed.
 5. From this project directory, run `python3 -m retrobox`.
 
+### Start RetroBox automatically
+
+On the Raspberry Pi desktop, run `sh scripts/configure_autostart.sh` from this project directory. This creates a per-user desktop autostart entry, so RetroBox opens when that user logs into the graphical desktop. To remove it, run `sh scripts/configure_autostart.sh remove`. This is desktop-login startup, not a headless boot service; the GUI needs a graphical session. Startup output is logged to `~/.local/state/retrobox/launcher.log`.
+
 Use the arrow keys to select a game and press Enter, or double-click it. The Play Game button also launches the selected entry. RetroArch handles gamepad mappings and saves according to its own configuration.
 
 To use a separate configuration file, run `python3 -m retrobox --config /path/to/systems.json`.
