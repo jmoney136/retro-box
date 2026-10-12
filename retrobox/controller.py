@@ -13,6 +13,8 @@ _JS_EVENT = struct.Struct("@IhBB")
 _JS_EVENT_BUTTON = 0x01
 _JS_EVENT_AXIS = 0x02
 _DEADZONE = 16_000
+_BUTTON_A = 0
+_BUTTON_GUIDE = 8
 
 
 def decode_joystick_event(packet: bytes) -> tuple[int, int, int] | None:
@@ -38,7 +40,13 @@ class GamepadMapper:
         """Map an event to up/down/left/right/select, if it triggers an action."""
         event_type, number, value = event
         if event_type == _JS_EVENT_BUTTON:
-            return "select" if number == 0 and value == 1 else None
+            if value != 1:
+                return None
+            if number == _BUTTON_A:
+                return "select"
+            if number == _BUTTON_GUIDE:
+                return "exit"
+            return None
 
         if event_type != _JS_EVENT_AXIS or number not in (0, 1, 6, 7):
             return None

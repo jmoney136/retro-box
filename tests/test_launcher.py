@@ -4,11 +4,18 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from retrobox.__main__ import screen_scale
 from retrobox.controller import GamepadMapper, decode_joystick_event
 from retrobox.launcher import build_command, discover_games, find_core, load_config
 
 
 class LauncherTests(unittest.TestCase):
+    def test_screen_scale_fills_full_hd_display_without_oversizing_ui(self):
+        self.assertEqual(screen_scale(1920, 1080), 1.6)
+
+    def test_screen_scale_stays_usable_on_small_displays(self):
+        self.assertAlmostEqual(screen_scale(800, 600), 800 / 980)
+
     def test_decode_joystick_event_strips_initialization_flag(self):
         packet = struct.pack("@IhBB", 123, -32767, 0x82, 1)
         self.assertEqual(decode_joystick_event(packet), (0x02, 1, -32767))
@@ -22,6 +29,8 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual(mapper.map_event((0x02, 1, 32767)), "down")
         self.assertEqual(mapper.map_event((0x01, 0, 1)), "select")
         self.assertIsNone(mapper.map_event((0x01, 0, 0)))
+        self.assertEqual(mapper.map_event((0x01, 8, 1)), "exit")
+        self.assertIsNone(mapper.map_event((0x01, 8, 0)))
 
     def test_gamepad_mapper_uses_horizontal_axis_to_change_system(self):
         mapper = GamepadMapper()
