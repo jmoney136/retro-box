@@ -63,6 +63,24 @@ class LauncherTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "at least one system"):
                 load_config(config_path)
 
+    def test_load_config_resolves_relative_rom_folders_from_config_directory(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            project = Path(temporary_directory)
+            config_directory = project / "retrobox"
+            config_directory.mkdir()
+            config_path = config_directory / "systems.json"
+            config_path.write_text(
+                json.dumps({"systems": [{"folder": "../roms/nes"}]}),
+                encoding="utf-8",
+            )
+
+            config = load_config(config_path)
+
+            self.assertEqual(
+                Path(config["systems"][0]["folder"]),
+                (project / "roms/nes").resolve(),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

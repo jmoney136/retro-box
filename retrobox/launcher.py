@@ -18,6 +18,12 @@ def load_config(config_path: Path) -> dict[str, Any]:
         raise ValueError("Configuration must contain a 'systems' list.")
     if not config["systems"]:
         raise ValueError("Configuration must define at least one system.")
+
+    config_directory = config_path.expanduser().resolve().parent
+    for system in config["systems"]:
+        folder = Path(system["folder"]).expanduser()
+        if not folder.is_absolute():
+            system["folder"] = str((config_directory / folder).resolve())
     return config
 
 
