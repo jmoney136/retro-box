@@ -16,6 +16,7 @@ from retrobox.launcher import (
     discover_games,
     find_core,
     find_retroarch,
+    is_process_running,
     load_config,
 )
 
@@ -215,6 +216,9 @@ class RetroBoxApp:
                 "Install RetroArch, then check the 'retroarch' setting in retrobox/systems.json.",
             )
             return
+        if is_process_running(retroarch):
+            self.status_label.configure(text="RetroArch is already running. Close it before launching another game.")
+            return
 
         core = find_core(self.selected_system["core"], self.config.get("core_directories", []))
         if core is None:
@@ -254,7 +258,12 @@ class RetroBoxApp:
         self._show_system(self.systems[(current + offset) % len(self.systems)])
 
     def _poll_gamepad(self) -> None:
+        game_running = self.process is not None and self.process.poll() is None
         for action in self.gamepad.poll():
+            if game_running:
+                if action == "exit":
+                    self._exit_game()
+                continue
             if action == "up":
                 self._move_game_selection(-1)
             elif action == "down":

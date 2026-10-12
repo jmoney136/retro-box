@@ -1,0 +1,40 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Test and sync RetroBox duplicate-launch fix",
+			"type": "shell",
+			"command": "sh",
+			"args": [
+				"-lc",
+				"python3 -m unittest discover -s tests -v && python3 -m compileall -q retrobox tests && COPYFILE_DISABLE=1 tar -czf /tmp/retrobox-duplicate-guard.tgz -C '/Users/jasparryding/Desktop/projects/retro box' retrobox/launcher.py retrobox/__main__.py tests/test_launcher.py README.md && scp -o ConnectTimeout=5 /tmp/retrobox-duplicate-guard.tgz retrobox@192.168.175.199:~/retro-box/"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Bundle duplicate-launch fix",
+			"type": "shell",
+			"command": "sh",
+			"args": [
+				"-lc",
+				"pwd && ls -l retrobox/launcher.py retrobox/__main__.py tests/test_launcher.py README.md && COPYFILE_DISABLE=1 tar -czf /tmp/retrobox-duplicate-guard.tgz ./retrobox/launcher.py ./retrobox/__main__.py ./tests/test_launcher.py ./README.md && ls -lh /tmp/retrobox-duplicate-guard.tgz"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Copy launcher update to Pi",
+			"type": "shell",
+			"command": "scp",
+			"args": [
+				"-o",
+				"ConnectTimeout=5",
+				"/tmp/retrobox-duplicate-guard.tgz",
+				"retrobox@192.168.175.199:~/retro-box/"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

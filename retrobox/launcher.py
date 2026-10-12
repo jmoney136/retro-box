@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -63,6 +64,20 @@ def find_retroarch(command: str) -> str | None:
     if os.path.isfile(expanded) and os.access(expanded, os.X_OK):
         return expanded
     return shutil.which(expanded)
+
+
+def is_process_running(command: str) -> bool:
+    """Check for an existing instance of an executable without invoking a shell."""
+    try:
+        result = subprocess.run(
+            ["pgrep", "-x", Path(command).name],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+    except OSError:
+        return False
+    return result.returncode == 0
 
 
 def build_command(retroarch: str, core: Path, game: Path) -> list[str]:

@@ -3,10 +3,17 @@ import struct
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from retrobox.__main__ import screen_scale
 from retrobox.controller import GamepadMapper, decode_joystick_event
-from retrobox.launcher import build_command, discover_games, find_core, load_config
+from retrobox.launcher import (
+    build_command,
+    discover_games,
+    find_core,
+    is_process_running,
+    load_config,
+)
 
 
 class LauncherTests(unittest.TestCase):
@@ -15,6 +22,17 @@ class LauncherTests(unittest.TestCase):
 
     def test_screen_scale_stays_usable_on_small_displays(self):
         self.assertAlmostEqual(screen_scale(800, 600), 800 / 980)
+
+    @patch("retrobox.launcher.subprocess.run")
+    def test_is_process_running_detects_existing_retroarch(self, run):
+        run.return_value.returncode = 0
+        self.assertTrue(is_process_running("/usr/bin/retroarch"))
+        run.assert_called_once()
+
+    @patch("retrobox.launcher.subprocess.run")
+    def test_is_process_running_returns_false_when_not_running(self, run):
+        run.return_value.returncode = 1
+        self.assertFalse(is_process_running("retroarch"))
 
     def test_decode_joystick_event_strips_initialization_flag(self):
         packet = struct.pack("@IhBB", 123, -32767, 0x82, 1)
